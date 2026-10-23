@@ -82,3 +82,13 @@ Derleyici olarak ink'in resmi JavaScript portu [inkjs](https://github.com/y-lohs
 ## Lisans
 
 MIT. ink motoru © inkle Ltd. (MIT, bkz. `LICENSE-ink.txt`). Enolink! inkle tarafından geliştirilmemiştir ve onlarla bağlantılı değildir.
+
+### Yeni sürüm yayınlamak
+
+`package.json` içindeki `version`'ı artır, `.github/SURUM_NOTLARI.md`'yi güncelle, sonra:
+
+```bash
+git commit -am "Sürüm 1.0.1" && git tag v1.0.1 && git push && git push --tags
+```
+
+GitHub Actions paketleri derleyip sürümü otomatik yayınlar.

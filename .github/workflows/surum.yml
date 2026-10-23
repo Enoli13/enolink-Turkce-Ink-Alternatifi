@@ -1,0 +1,52 @@
+name: Sürüm yayınla
+
+# "v1.2.3" biçiminde bir etiket gönderildiğinde Linux ve Windows paketlerini
+# derler ve GitHub sürümü (release) olarak yayınlar.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  paketle:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: NSIS kur (Windows kurulum programı için)
+        run: sudo apt-get update && sudo apt-get install -y nsis
+
+      - name: Bağımlılıkları kur
+        run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+
+      - name: Sürüm numarasını kontrol et
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          if [ "v$PKG" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Etiket ($GITHUB_REF_NAME) package.json sürümüyle ($PKG) uyuşmuyor"; exit 1
+          fi
+
+      - name: Paketle
+        run: npm run paketle
+
+      - name: Sürümü yayınla
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SURUM="${GITHUB_REF_NAME#v}"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --title "Enolink! $SURUM — Türkçe İnk alternatifi" \
+              --notes-file .github/SURUM_NOTLARI.md
+          fi
