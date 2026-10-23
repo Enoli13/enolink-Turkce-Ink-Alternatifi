@@ -85,10 +85,4 @@ MIT. ink motoru © inkle Ltd. (MIT, bkz. `LICENSE-ink.txt`). Enolink! inkle tara
 
 ### Yeni sürüm yayınlamak
 
-`package.json` içindeki `version`'ı artır, `.github/SURUM_NOTLARI.md`'yi güncelle, sonra:
-
-```bash
-git commit -am "Sürüm 1.0.1" && git tag v1.0.1 && git push && git push --tags
-```
-
-GitHub Actions paketleri derleyip sürümü otomatik yayınlar.
+`package.json` içindeki `version`'ı artır (ör. `1.0.1`), `.github/SURUM_NOTLARI.md`'yi güncelle ve `main`'e gönder. GitHub Actions paketleri derler, `v1.0.1` etiketini ve sürümü otomatik oluşturur. İstersen Actions sekmesinden **Run workflow** ile elle de başlatabilirsin.

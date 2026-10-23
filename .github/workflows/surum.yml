@@ -1,52 +1,74 @@
 name: Sürüm yayınla
 
-# "v1.2.3" biçiminde bir etiket gönderildiğinde Linux ve Windows paketlerini
-# derler ve GitHub sürümü (release) olarak yayınlar.
+# Linux ve Windows paketlerini derleyip GitHub sürümü (release) olarak yayınlar.
+# Tetikleyiciler:
+#  - main'de package.json değişince: o sürüm henüz yayınlanmadıysa yayınlar
+#  - "v1.2.3" biçiminde etiket gönderilince
+#  - Actions sekmesinden elle ("Run workflow")
 on:
   push:
+    branches: [main]
+    paths: ['package.json', '.github/workflows/surum.yml']
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: surum
+  cancel-in-progress: false
+
 jobs:
   paketle:
     runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Sürümü belirle
+        id: s
+        run: |
+          SURUM=$(node -p "require('./package.json').version")
+          ETIKET="v$SURUM"
+          echo "surum=$SURUM" >> "$GITHUB_OUTPUT"
+          echo "etiket=$ETIKET" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "$ETIKET" ]; then
+            echo "::error::Etiket ($GITHUB_REF_NAME) package.json sürümüyle ($SURUM) uyuşmuyor"; exit 1
+          fi
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$GITHUB_REF_TYPE" = "branch" ] && gh release view "$ETIKET" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "$ETIKET zaten yayınlanmış, atlanıyor."; echo "atla=1" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.s.outputs.atla != '1'
         with:
           node-version: 22
           cache: npm
 
       - name: NSIS kur (Windows kurulum programı için)
+        if: steps.s.outputs.atla != '1'
         run: sudo apt-get update && sudo apt-get install -y nsis
 
       - name: Bağımlılıkları kur
+        if: steps.s.outputs.atla != '1'
         run: npm ci
         env:
           ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
 
-      - name: Sürüm numarasını kontrol et
-        run: |
-          PKG=$(node -p "require('./package.json').version")
-          if [ "v$PKG" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Etiket ($GITHUB_REF_NAME) package.json sürümüyle ($PKG) uyuşmuyor"; exit 1
-          fi
-
       - name: Paketle
+        if: steps.s.outputs.atla != '1'
         run: npm run paketle
 
       - name: Sürümü yayınla
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: steps.s.outputs.atla != '1'
         run: |
-          SURUM="${GITHUB_REF_NAME#v}"
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          ETIKET="${{ steps.s.outputs.etiket }}"
+          if gh release view "$ETIKET" >/dev/null 2>&1; then
+            gh release upload "$ETIKET" dist/* --clobber
           else
-            gh release create "$GITHUB_REF_NAME" dist/* \
-              --title "Enolink! $SURUM — Türkçe İnk alternatifi" \
+            gh release create "$ETIKET" dist/* --target "$GITHUB_SHA" \
+              --title "Enolink! ${{ steps.s.outputs.surum }} — Türkçe İnk alternatifi" \
               --notes-file .github/SURUM_NOTLARI.md
           fi
