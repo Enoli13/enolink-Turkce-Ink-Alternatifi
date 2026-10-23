@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Enolink!
+GenericName=Hikâye Editörü
+Comment=Türkçe İnk alternatifi — hikâye yaz, dene ve Unity'ye aktar
+Exec=@YOL@/enolink.sh %f
+Icon=@IKON@
+Terminal=false
+Categories=Development;TextEditor;Game;
+MimeType=text/x-ink;
+StartupWMClass=Enolink
+Keywords=ink;inkle;unity;hikaye;story;

@@ -1,0 +1,52 @@
+ENOLINK! — TÜRKÇE İNK ALTERNATİFİ — UNITY ENTEGRASYONU
+======================================
+
+Bu klasörü Enolink! oluşturdu. Her "Unity'ye Aktar"da güncellenir.
+
+Klasörler
+---------
+Resources/EnolinkHikayeler/<ad>.json        Derlenmiş hikâye
+Resources/EnolinkHikayeler/<ad>_ayar.json   Aktarım ayarları (sıralı/rastgele, havuz, tohum…)
+Scripts/InkHikayeYoneticisi.cs          Hikâyeyi oynatan bileşen
+Scripts/InkBasitArayuz.cs               Hazır deneme arayüzü (hiçbir paket gerekmez)
+Runtime/                                 ink 1.2.1 C# çalışma zamanı (inkle, MIT lisansı)
+
+Hızlı başlangıç
+---------------
+1) Unity menüsünden:  Enolink! > Sahneye Hikâye Yöneticisi Ekle
+2) Play'e bas.
+
+Kendi arayüzünle kullanmak
+--------------------------
+  var y = GetComponent<Enolink.InkHikayeYoneticisi>();
+
+  string satir = y.Ilerle();          // sıradaki satır (yoksa null)
+  string metin = y.TumunuIlerle();    // seçim noktasına kadar tüm metin
+  var secenekler = y.MevcutSecenekler; // List<Ink.Runtime.Choice>
+  y.SecimYap(0);                      // listedeki 1. seçeneği seç
+  y.DegiskenAl("altin");  y.DegiskenAyarla("altin", 20);
+  string kayit = y.KayitAl();  y.KayitYukle(kayit);
+
+Olaylar (Inspector'dan da bağlanabilir):
+  MetinGeldi(string satir, List<string> etiketler)
+  SeceneklerGeldi(List<Choice>)
+  BlokBasladi(string dugumAdi)   BlokBitti(string dugumAdi)   HikayeBitti()
+
+RASTGELE (RANDOMIZE) MOD
+------------------------
+Enolink!'te "Randomize" açıkken aktarırsan her düğüm (=== ad ===) bir metin bloğudur.
+Yönetici havuzdan rastgele bir blok seçer; blok bitince (seçenek kalmayınca veya
+-> END / -> DONE) Ilerle() otomatik olarak sıradaki rastgele bloğa geçer.
+
+  • "Önce her zaman bununla başla" seçiliyse ilk blok sabittir, sonrası rastgele.
+  • "Tekrar etmesin" açıksa tüm bloklar bitmeden aynı blok gelmez; hepsi bitince
+    HikayeBitti tetiklenir (Inspector'daki "Bitince Yeniden Karıştır" ile sonsuz olur).
+  • "Her oyunda yeniden karıştır" kapalıysa Enolink!'in aktarımda ürettiği sıra kullanılır.
+  • "Sabit tohum" ile her çalıştırmada aynı karışık sıra elde edilir (test için iyi).
+  • "Seçeneklerin sırasını da karıştır" açıksa MevcutSecenekler karışık gelir.
+  • Inspector'daki "Mod" alanı ile aktarım ayarını ezebilirsin (Sirali / Rastgele).
+
+Not: Değişkenler (VAR) bloklar arasında korunur; bir blokta artan "altin" diğerinde de geçerlidir.
+
+Çakışma uyarısı: Projende resmi "ink-unity-integration" eklentisi varsa, Enolink!'te
+"Ink çalışma zamanını da kopyala" seçeneğini kapat ve bu klasördeki Runtime/ klasörünü sil.

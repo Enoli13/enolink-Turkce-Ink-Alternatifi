@@ -1,0 +1,7 @@
+ENOLINK! — TÜRKÇE İNK ALTERNATİFİ — WINDOWS 11
+==============================
+Taşınabilir sürüm: Klasörü istediğin yere çıkar ve Enolink.exe'yi çalıştır.
+Kurulumlu sürüm: Enolink-…-Kurulum.exe'yi çalıştır (Başlat menüsü + masaüstü kısayolu + .ink dosya ilişkilendirmesi).
+
+İlk açılışta Windows SmartScreen "Windows bilgisayarınızı korudu" diyebilir; uygulama imzasız olduğu
+için bu normaldir: "Ek bilgi" → "Yine de çalıştır".

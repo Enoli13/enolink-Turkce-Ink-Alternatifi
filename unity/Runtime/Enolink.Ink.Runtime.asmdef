@@ -1,0 +1,12 @@
+{
+    "name": "Enolink.Ink.Runtime",
+    "rootNamespace": "Ink.Runtime",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "noEngineReferences": true
+}

@@ -1,0 +1,26 @@
+# CachyOS / Arch Linux paketi — Enolink!
+# Kullanım: bu dosya ile Enolink-@SURUM@-linux-x64.tar.gz aynı klasörde iken  makepkg -si
+pkgname=enolink
+pkgver=@SURUM@
+pkgrel=1
+pkgdesc="Enolink! - Turkce Ink alternatifi. Ink hikaye editoru - Turkce arayuz, Unity aktarimi ve rastgele (randomize) mod"
+arch=('x86_64')
+license=('MIT')
+depends=('gtk3' 'nss' 'alsa-lib' 'libxss' 'libxtst' 'xdg-utils')
+options=('!strip' '!debug')
+source=("Enolink-${pkgver}-linux-x64.tar.gz")
+sha256sums=('@SHA@')
+
+package() {
+  install -d "$pkgdir/opt/enolink"
+  cp -r "$srcdir/Enolink-linux-x64/." "$pkgdir/opt/enolink/"
+  rm -f "$pkgdir/opt/enolink/kur.sh" "$pkgdir/opt/enolink/kaldir.sh"
+  install -d "$pkgdir/usr/bin"
+  ln -s /opt/enolink/enolink.sh "$pkgdir/usr/bin/enolink"
+  install -Dm644 "$srcdir/Enolink-linux-x64/enolink.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/enolink.png"
+  install -Dm644 "$srcdir/Enolink-linux-x64/ink-mime.xml" "$pkgdir/usr/share/mime/packages/enolink.xml"
+  sed -e "s|@YOL@|/opt/enolink|" -e "s|@IKON@|enolink|" \
+    "$srcdir/Enolink-linux-x64/enolink.desktop" > "$srcdir/enolink.desktop"
+  install -Dm644 "$srcdir/enolink.desktop" "$pkgdir/usr/share/applications/enolink.desktop"
+  install -Dm644 "$srcdir/Enolink-linux-x64/resources/app/LICENSE-ink.txt" "$pkgdir/usr/share/licenses/$pkgname/LICENSE-ink.txt"
+}

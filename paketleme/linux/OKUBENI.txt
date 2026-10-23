@@ -1,0 +1,10 @@
+ENOLINK! — TÜRKÇE İNK ALTERNATİFİ — LINUX (CachyOS)
+===================================
+Kurmadan çalıştırmak:   ./enolink.sh
+Menüye kurmak:          ./kur.sh          (root gerekmez, ~/.local altına kurar)
+Kaldırmak:              ./kaldir.sh
+
+CachyOS/Arch için paket olarak kurmak istersen PKGBUILD ile:
+  PKGBUILD ve Enolink-*-linux-x64.tar.gz aynı klasörde olsun, sonra:  makepkg -si
+
+Not: Uygulama açılmazsa (nadiren, sandbox hatası verirse)  ./enolink.sh --no-sandbox  ile dene.

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Enolink! — Türkçe İnk alternatifi</title>
+<link rel="stylesheet" href="../node_modules/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="../node_modules/codemirror/addon/dialog/dialog.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="ust">
+  <div class="marka"><span class="logo">Enolink!</span><span class="marka-ad">Türkçe İnk alternatifi</span></div>
+  <div class="dosya-bilgi"><span id="dosyaAdi">adsız.ink</span><span id="degisti" class="degisti" hidden>●</span></div>
+  <div class="ust-dugmeler">
+    <button id="btnDerle" title="Derle ve hataları kontrol et (F5)">Derle</button>
+    <button id="btnOynat" title="Baştan oynat (F6)">▶ Oynat</button>
+    <button id="btnUnity" class="vurgu" title="Unity'ye aktar (Ctrl+U)">Unity'ye Aktar</button>
+    <button id="btnPanel" class="ikon" title="Paneli göster/gizle (Ctrl+B)">☰</button>
+  </div>
+</header>
+
+<main class="govde">
+  <section class="sol">
+    <div id="editor" class="editor"></div>
+    <div class="hata-cubugu" id="hataCubugu">
+      <div class="hata-baslik" id="hataBaslik"><span id="durumNokta" class="nokta"></span><span id="hataOzet">Henüz derlenmedi</span><span class="sag-yazi" id="imlecBilgi">Satır 1, Sütun 1</span></div>
+      <ul id="hataListesi" class="hata-listesi"></ul>
+    </div>
+  </section>
+
+  <aside class="panel" id="panel">
+    <nav class="sekmeler" role="tablist">
+      <button data-sekme="oynat" class="aktif">Oynat</button>
+      <button data-sekme="unity">Unity</button>
+      <button data-sekme="yapi">Yapı</button>
+      <button data-sekme="ekle">Ekle</button>
+      <button data-sekme="dosya">Dosya</button>
+      <button data-sekme="ayarlar">Ayarlar</button>
+      <button data-sekme="yardim">Yardım</button>
+    </nav>
+
+    <!-- OYNAT -->
+    <div class="sekme-icerik aktif" data-icerik="oynat">
+      <div class="arac-satiri">
+        <button id="oyBastan">Baştan</button>
+        <button id="oyGeri" title="Son seçimi geri al">Geri al</button>
+        <label class="anahtar"><input type="checkbox" id="oyRastgele"><span>Rastgele mod</span></label>
+      </div>
+      <p class="ipucu" id="oyAciklama">Hikâyeyi Unity'de nasıl görüneceği gibi dener. Rastgele mod açıksa metin blokları (düğümler) karışık sırayla gelir.</p>
+      <div id="oyunAlani" class="oyun-alani"></div>
+      <details class="degiskenler"><summary>Değişkenler</summary><table id="degiskenTablosu"></table></details>
+    </div>
+
+    <!-- UNITY -->
+    <div class="sekme-icerik" data-icerik="unity">
+      <div class="kart">
+        <h3>Unity projesi</h3>
+        <div class="yol-satiri"><code id="unityYolu">Seçilmedi</code><button id="unitySec">Seç…</button></div>
+        <p class="ipucu" id="unityDurum">Unity projenin ana klasörünü seç (içinde <b>Assets</b> olan klasör).</p>
+        <label class="satir">Hikâye adı (Unity'de) <input id="unityAd" placeholder="dosya adından alınır"></label>
+      </div>
+
+      <div class="kart rastgele-kart">
+        <label class="anahtar buyuk"><input type="checkbox" id="unityRastgele"><span>Randomize (rastgele sırayla aktar)</span></label>
+        <p class="ipucu">Açıkken her düğüm (<code>=== ad ===</code>) ayrı bir metin bloğu olur ve Unity'de <b>rastgele sırayla</b> çıkar. Oyuncu hangi metnin ne zaman geleceğini bilemez.</p>
+        <div id="rastgeleAyarlar" class="rastgele-ayarlar">
+          <label class="satir">Önce her zaman bununla başla
+            <select id="unityBaslangic"><option value="">(yok — tamamen rastgele)</option></select></label>
+          <div class="havuz-baslik"><span>Rastgele havuzdaki bloklar</span><span><a href="#" id="havuzTumu">tümü</a> · <a href="#" id="havuzHicbiri">hiçbiri</a></span></div>
+          <div id="havuzListesi" class="havuz-listesi"><p class="ipucu">Önce derle.</p></div>
+          <label class="anahtar"><input type="checkbox" id="unityTekrarYok" checked><span>Tekrar etmesin (hepsi bitmeden aynı blok gelmez)</span></label>
+          <label class="anahtar"><input type="checkbox" id="unityHerOyun" checked><span>Her oyunda yeniden karıştır</span></label>
+          <label class="anahtar"><input type="checkbox" id="unitySecKaristir"><span>Seçeneklerin sırasını da karıştır</span></label>
+          <label class="anahtar"><input type="checkbox" id="unitySabitTohum"><span>Sabit tohum kullan (her seferinde aynı karışık sıra)</span></label>
+          <label class="satir tohum-satiri" id="tohumSatiri" hidden>Tohum <input id="unityTohum" type="number" placeholder="ör. 1234"></label>
+        </div>
+      </div>
+
+      <div class="kart">
+        <label class="anahtar"><input type="checkbox" id="unityRuntime" checked><span>Ink çalışma zamanını (C#) da kopyala</span></label>
+        <p class="ipucu">Projende zaten resmi "ink-unity-integration" eklentisi varsa bunu kapat.</p>
+        <label class="anahtar"><input type="checkbox" id="unityCanli"><span>Kaydedince otomatik aktar (canlı bağlantı)</span></label>
+      </div>
+      <div class="arac-satiri">
+        <button id="unityAktarBtn" class="vurgu genis">Unity'ye Aktar</button>
+        <button id="unityKlasorAc" disabled>Klasörü aç</button>
+      </div>
+      <p id="unitySonuc" class="sonuc"></p>
+    </div>
+
+    <!-- YAPI -->
+    <div class="sekme-icerik" data-icerik="yapi">
+      <div class="kart"><h3>İstatistikler</h3><div id="istatistik" class="istatistik"></div></div>
+      <div class="kart"><h3>Düğümler <small>(tıkla → git)</small></h3><input id="dugumAra" placeholder="Düğüm ara…"><ul id="dugumListesi" class="dugum-listesi"></ul></div>
+    </div>
+
+    <!-- EKLE -->
+    <div class="sekme-icerik" data-icerik="ekle">
+      <p class="ipucu">İmlecin olduğu yere hazır kalıp ekler.</p>
+      <div id="sablonlar" class="sablonlar"></div>
+    </div>
+
+    <!-- DOSYA -->
+    <div class="sekme-icerik" data-icerik="dosya">
+      <div class="dugme-izgara">
+        <button id="dYeni">Yeni</button><button id="dAc">Aç…</button>
+        <button id="dKaydet">Kaydet</button><button id="dFarkli">Farklı kaydet…</button>
+        <button id="dJson">JSON dışa aktar…</button><button id="dOrnek">Örnek hikâye yükle</button>
+      </div>
+      <div class="kart"><h3>Son dosyalar</h3><ul id="sonDosyalar" class="son-dosyalar"></ul></div>
+    </div>
+
+    <!-- AYARLAR -->
+    <div class="sekme-icerik" data-icerik="ayarlar">
+      <div class="kart">
+        <label class="satir">Tema <select id="ayTema"><option value="koyu">Koyu</option><option value="acik">Açık</option></select></label>
+        <label class="satir">Yazı boyutu <input id="ayBoyut" type="range" min="11" max="24" value="15"><span id="ayBoyutDeger">15</span></label>
+        <label class="anahtar"><input type="checkbox" id="ayOtoDerle" checked><span>Yazarken otomatik derle</span></label>
+        <label class="anahtar"><input type="checkbox" id="aySatirKaydir" checked><span>Uzun satırları kaydır</span></label>
+        <label class="anahtar"><input type="checkbox" id="ayOtoKaydet"><span>Otomatik kaydet (30 sn)</span></label>
+      </div>
+    </div>
+
+    <!-- YARDIM -->
+    <div class="sekme-icerik yardim" data-icerik="yardim" id="yardimIcerik"></div>
+  </aside>
+</main>
+
+<div id="bildirim" class="bildirim" hidden></div>
+
+<script src="../node_modules/codemirror/lib/codemirror.js"></script>
+<script src="../node_modules/codemirror/addon/mode/simple.js"></script>
+<script src="../node_modules/codemirror/addon/dialog/dialog.js"></script>
+<script src="../node_modules/codemirror/addon/search/searchcursor.js"></script>
+<script src="../node_modules/codemirror/addon/search/search.js"></script>
+<script src="../node_modules/codemirror/addon/search/jump-to-line.js"></script>
+<script src="../node_modules/codemirror/addon/edit/closebrackets.js"></script>
+<script src="../node_modules/codemirror/addon/selection/active-line.js"></script>
+<script src="../node_modules/inkjs/dist/ink.js"></script>
+<script src="ink-mode.js"></script>
+<script src="icerik.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

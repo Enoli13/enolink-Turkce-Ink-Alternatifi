@@ -1,0 +1,36 @@
+// Ink söz dizimi renklendirme (CodeMirror simple mode)
+CodeMirror.defineSimpleMode('ink', {
+  start: [
+    { regex: /\/\/.*/, token: 'comment' },
+    { regex: /\/\*/, token: 'comment', next: 'yorum' },
+    { regex: /^\s*={2,}\s*(function\s+)?[\w]+.*$/, token: 'header dugum', sol: true },
+    { regex: /^\s*=\s*\w+.*$/, token: 'header altbolum', sol: true },
+    { regex: /^\s*(INCLUDE|VAR|CONST|LIST|EXTERNAL)\b/, token: 'keyword', sol: true },
+    { regex: /^\s*~.*$/, token: 'mantik', sol: true },
+    { regex: /^(\s*)([*+](\s*[*+])*)/, token: [null, 'secenek'], sol: true },
+    { regex: /^(\s*)(-(?!>)(\s*-(?!>))*)/, token: [null, 'toplanma'], sol: true },
+    { regex: /\([\w]+\)/, token: 'etiketad' },
+    { regex: /<-\s*[\w.]+/, token: 'yonlendirme' },
+    { regex: /->->|->\s*[\w.]*/, token: 'yonlendirme' },
+    { regex: /<>/, token: 'yapiskan' },
+    { regex: /#[^#\n\]]*/, token: 'etiket' },
+    { regex: /\[|\]/, token: 'koseli' },
+    { regex: /\{/, token: 'suslu', push: 'ifade' },
+  ],
+  ifade: [
+    { regex: /\}/, token: 'suslu', pop: true },
+    { regex: /\{/, token: 'suslu', push: 'ifade' },
+    { regex: /\b(true|false|not|and|or|mod)\b/, token: 'atom' },
+    { regex: /[~&!$]|\|/, token: 'operator' },
+    { regex: /-?\d+(\.\d+)?/, token: 'number' },
+    { regex: /"(?:[^\\"]|\\.)*"/, token: 'string' },
+    { regex: /->\s*[\w.]*/, token: 'yonlendirme' },
+    { regex: /[\w.]+(?=\s*[:(])/, token: 'variable-2' },
+    { regex: /./, token: 'ifade-ic' },
+  ],
+  yorum: [
+    { regex: /.*?\*\//, token: 'comment', next: 'start' },
+    { regex: /.*/, token: 'comment' },
+  ],
+  meta: { lineComment: '//', blockCommentStart: '/*', blockCommentEnd: '*/' },
+});

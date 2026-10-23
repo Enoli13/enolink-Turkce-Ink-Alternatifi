@@ -1,0 +1,5 @@
+node_modules/
+dist/
+paketleme/.indirilenler/
+paketleme/.is/
+*.log

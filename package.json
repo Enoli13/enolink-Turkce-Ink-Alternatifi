@@ -1,0 +1,21 @@
+{
+  "name": "enolink",
+  "version": "1.0.0",
+  "description": "Enolink! — Türkçe İnk alternatifi. Ink hikâye editörü — Türkçe arayüz, Unity aktarımı ve rastgele (randomize) mod",
+  "main": "main.js",
+  "author": "Enoli",
+  "license": "MIT",
+  "dependencies": {
+    "codemirror": "5.65.18",
+    "inkjs": "2.4.0"
+  },
+  "productName": "Enolink!",
+  "scripts": {
+    "start": "electron .",
+    "paketle": "bash paketleme/paketle.sh"
+  },
+  "devDependencies": {
+    "electron": "33.4.11",
+    "resedit": "^1.7.2"
+  }
+}
